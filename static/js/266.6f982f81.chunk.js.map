@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/266.6f982f81.chunk.js","mappings":"2MAEe,SAASA,IACtB,OAAO,SAAC,IAAD,GACR,C","sources":["pages/Home.js"],"sourcesContent":["import { Hero } from 'components/Hero/Hero';\n\nexport default function Home() {\n  return <Hero />;\n}\n"],"names":["Home"],"sourceRoot":""}
