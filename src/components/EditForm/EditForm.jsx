@@ -1,12 +1,14 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
-import * as s from './ContactForm.styled';
-import { addContact } from 'redux/operations';
+import { editContact } from 'redux/operations';
 import { selectUsers } from 'redux/selectors';
+import * as s from './EditForm.styled';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-export default function ContactForm() {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+export const EditForm = ({ editName, editNumber, id, closeModal }) => {
+  const [name, setName] = useState(editName);
+  const [number, setNumber] = useState(editNumber);
+  const [buttonDisabled, setbuttonDisabled] = useState(true);
   const dispatch = useDispatch();
   const users = useSelector(selectUsers);
 
@@ -25,23 +27,26 @@ export default function ContactForm() {
       default:
         break;
     }
+    if (name !== editName || number !== editNumber) {
+      setbuttonDisabled(false);
+    }
   };
 
-  const isDuplicateUser = users.some(
+  const isDuplicateEditUser = users.some(
     contact => contact.name.toLowerCase() === name.toLowerCase()
   );
 
-  const handleSubmit = event => {
-    event.preventDefault();
+  const handleSubmit = e => {
+    e.preventDefault();
 
-    if (isDuplicateUser) {
-      alert('This name is already in the contacts list.');
-      reset();
+    if (isDuplicateEditUser) {
+      Notify.failure('Such a name already exists! When changing the number, you must change the name!');
       return;
     }
 
-    dispatch(addContact({ name, number }));
+    dispatch(editContact({ name, number, id }));
     reset();
+    closeModal();
   };
 
   const reset = () => {
@@ -56,9 +61,6 @@ export default function ContactForm() {
         <input
           type="text"
           name="name"
-          pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Name may contain only letters, apostrophe, dash and spaces. 
-            For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
           value={name}
           onChange={handleCange}
@@ -70,15 +72,15 @@ export default function ContactForm() {
         <input
           type="tel"
           name="number"
-          pattern="\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}"
-          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
           value={number}
           onChange={handleCange}
         />
       </s.Label>
 
-      <button type="submit">Add contact</button>
+      <button disabled={buttonDisabled} type="submit">
+        Change
+      </button>
     </s.Form>
   );
-}
+};
